@@ -5,7 +5,7 @@ import glob
 
 def get_all_pages():
     pages = []
-    for file in glob.glob("html/*.html"):
+    for file in glob.glob('html/*.html'):
         pages.append(get_page(file[5:-5]))
     return pages
 
