@@ -92,8 +92,9 @@ class IGEMHTTPRequestHandler(server.SimpleHTTPRequestHandler):
                     if k not in ["Transfer-Encoding"]:
                         self.send_header(k, v)
                 self.end_headers()
-                self.wfile.write(resp.read().replace(host.encode('utf-8'),
-                                                     b'/'))
+                self.wfile.write(
+                    resp.read().replace(base_domain.encode('utf-8'), b'/')
+                )
         except urllib.error.HTTPError as e:
             self.send_response(e.code)
             self.end_headers()
