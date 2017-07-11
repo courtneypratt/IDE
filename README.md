@@ -13,7 +13,7 @@ and inserting only "IDE" as shown below for the Bristol team.
 
 ![](http://imgur.com/TQoEdXQ.png)
 
-Then run server.py and go to `localhost:8000/Team:TeamName` in your browser. You
+Then run `python3 server.py` and go to `localhost:8000/Team:TeamName` in your browser. You
  should then see the original iGEM wiki template for Bristol.
 
 ## Editing
@@ -51,8 +51,12 @@ You do not need to restart the server to reload any of these files.
 
 ## Build
 
-Currently not available. This will be added soon to output your files in a form
-that is compatible with the iGEM wiki.
+When you are ready to upload your wiki you will need to run the build script. Simply run `python3 build.py`. The output will be written into the `dist/` folder and the file directories correspond the to URLs they need to be uploaded to on the iGEM website.
+
+* css - All files under the css folder need to be uploaded to `"2017.igem.org/Template:TeamName/css/filepath"`.
+* js - All files under the js folder need to be uploaded to `"2017.igem.org/Template:TeamName/js/filepath"`.
+* templates - All files under the templates folder need to be uploaded to `"2017.igem.org/Template:TeamName/filepath"`.
+* Everything else must be uploaded to the `"2017.igem.org/Team:TeamName/filepath"` however, for `index.html` you must remove `/index` from the filepath.
 
 
 ## Creators
