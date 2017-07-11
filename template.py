@@ -1,6 +1,6 @@
 #!/usr/env python3
-import re
 import glob
+import re
 
 
 def get_all_pages():
