@@ -1,5 +1,6 @@
 #!/usr/env python3
 import glob
+import io
 import re
 import os
 
@@ -8,6 +9,7 @@ base_team = base_igem + 'Team:Bristol/'
 base_template = base_igem + 'Template:Bristol/'
 base_raw = '?action=raw&ctype=text/'
 
+extensions = ['.png', '.svg', '.gif', '.jpeg', '.jpg', '.bmp']
 
 def get_pages():
     pages = []
@@ -19,7 +21,9 @@ def get_pages():
 def build():
     links = create_links()
     for page in get_pages():
-        with open('html/' + page, 'r') as f:
+        if any(x in page.lower() for x in extensions):
+            continue
+        with io.open('html/' + page, 'r', encoding='utf-8') as f:
             text = f.read()
         for x in re.findall(r'\{\{([^}]+)\}\}', text):
             text = text.replace('{{' + x + '}}', links[x])
@@ -51,7 +55,7 @@ def create_links():
 def write(filename, output):
     filename = 'dist/' + filename
     os.makedirs(os.path.dirname(filename), exist_ok=True)
-    with open(filename, 'w') as f:
+    with io.open(filename, 'w', encoding='utf-8') as f:
         f.write(output)
 
 
