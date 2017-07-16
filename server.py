@@ -10,22 +10,23 @@ import urllib.request as request
 from template import get_page
 
 team_pages = {}
-host = "2017.igem.org"
-base_domain = "http://" + host + "/"
+host = "igem.org"
+served_at = "localhost:8000"
 
 
-def request_igem_file(path):
-    resp = request.urlopen(base_domain + path)
+def request_igem_file(path, sub_domain):
+    resp = request.urlopen("http://" + sub_domain + host + "/" + path)
     data = resp.read()
-    data = data.replace(base_domain.encode('utf-8'), b"/")
+    data = data.replace(host.encode("utf-8"), served_at.encode("utf-8"))
     return data, resp
 
 
-def get_wiki_template(team):
+def get_wiki_template(team, sub_domain):
     if team not in team_pages:
         try:
             data = re.split(r"<p>\W*IDE\W*</p>", request_igem_file(
-                "Team:" + team + "/IDE"
+                "Team:" + team + "/IDE",
+                sub_domain
             )[0].decode('utf-8'))
             if len(data) != 2:
                 return None
@@ -41,7 +42,9 @@ class IGEMHTTPRequestHandler(server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.startswith("/Team:"):
-            template = get_wiki_template(self.path[6:].split('/')[0])
+            sub_domain = self.headers["host"].replace(served_at, "")
+            team = self.path[6:].split('/')[0]
+            template = get_wiki_template(team, sub_domain)
             if template is None:
                 self.send_response(404)
                 self.end_headers()
@@ -76,12 +79,13 @@ class IGEMHTTPRequestHandler(server.SimpleHTTPRequestHandler):
 
     def proxy_upstream(self):
         head = self.headers
-        head["Host"] = host
+        nhost = head["Host"].replace(served_at, host)
+        head["Host"] = nhost
         del head["Origin"]
         data = None
         if self.command == "POST":
             data = self.rfile.read(int(self.headers['Content-Length']))
-        req = request.Request(base_domain + self.path[1:],
+        req = request.Request("http://" + nhost + self.path,
                               data=data,
                               headers=head,
                               method=self.command)
@@ -90,10 +94,13 @@ class IGEMHTTPRequestHandler(server.SimpleHTTPRequestHandler):
                 self.send_response(resp.status)
                 for k, v in dict(resp.info()).items():
                     if k not in ["Transfer-Encoding"]:
-                        self.send_header(k, v)
+                        self.send_header(k, v.replace(host, served_at))
                 self.end_headers()
                 self.wfile.write(
-                    resp.read().replace(base_domain.encode('utf-8'), b'/')
+                    resp.read().replace(
+                        host.encode('utf-8'),
+                        served_at.encode('utf-8')
+                    ).replace(b"https", b"http")
                 )
         except urllib.error.HTTPError as e:
             self.send_response(e.code)
