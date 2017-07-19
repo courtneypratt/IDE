@@ -6,10 +6,11 @@ IDE is a useful tool to allow local development for iGEM wiki users.
 
 ## Setup
 
-In order to use IDE you will need python3.
+In order to use IDE you will need python3 installed.
 
-Create an IDE page at `2017.igem.org/Team:TeamName/IDE` by editing the wiki page
-and inserting only "IDE" as shown below for the Bristol team.
+Firstly edit the file `settings.py` and enter your team_name as shown exactly on the iGEM wiki url to set up IDE to work with your team name.
+
+Secondly create an IDE page at `2017.igem.org/Team:TeamName/IDE` by editing the wiki page and inserting only "IDE" as shown below for the Bristol team.
 
 ![](http://imgur.com/TQoEdXQ.png)
 
