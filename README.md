@@ -33,7 +33,7 @@ There are currently three sub-folders of importance:
  * templates - This folder should contain your templates. For example, the
    original template is included. To use it on a page you add a reference to
    the template as in wiki, that is `{{templates/header}}` to reference
-   the header template
+   the header template. Note due to the iGEM Wiki system all html templates must be included outside the `html` tag, either above or below it. 
 
 It is recommended that you have a generic header and footer template that apply
 across the entirety of your wiki for ease of use.
@@ -52,7 +52,10 @@ You do not need to restart the server to reload any of these files.
 
 ## Build
 
-When you are ready to upload your wiki you will need to run the build script. Simply run `python3 build.py`. The output will be written into the `dist/` folder and the file directories correspond the to URLs they need to be uploaded to on the iGEM website.
+When you are ready to upload your wiki you will need to run the build script.
+Simply run `python3 build.py`. The output will be written into the `dist/`
+folder and the file directories correspond the to URLs they need to be uploaded
+to on the iGEM website.
 
 * css - All files under the css folder need to be uploaded to `"2017.igem.org/Template:TeamName/css/filepath"`.
 * js - All files under the js folder need to be uploaded to `"2017.igem.org/Template:TeamName/js/filepath"`.

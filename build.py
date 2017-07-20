@@ -4,14 +4,13 @@ import io
 import re
 import os
 
-from settings import team
-
 base_igem = 'http://2017.igem.org/'
-base_team = base_igem + 'Team:' + team + '/'
-base_template = base_igem + 'Template:' + team + '/'
+base_team = base_igem + 'Team:Bristol/'
+base_template = base_igem + 'Template:Bristol/'
 base_raw = '?action=raw&ctype=text/'
 
 extensions = ['.png', '.svg', '.gif', '.jpeg', '.jpg', '.bmp']
+
 
 def get_pages():
     pages = []
@@ -23,6 +22,7 @@ def get_pages():
 def build():
     links = create_links()
     for page in get_pages():
+        print(page)
         if any(x in page.lower() for x in extensions):
             continue
         with io.open('html/' + page, 'r', encoding='utf-8') as f:
@@ -36,14 +36,13 @@ def create_links():
     links = {}
     for page in get_pages():
         if 'css/' in page:
-            tmp = base_template + page[4:-4] + base_raw + 'css'
+            tmp = base_template + 'css/' + page[4:-4] + base_raw + 'css'
             links[page[:-4]] = '<link rel="stylesheet" type="text/css" href="' + tmp + '" />'
         elif 'js/' in page:
-            tmp = base_template + page[3:-3] + base_raw + 'javascript'
+            tmp = base_template + 'js/' + page[3:-3] + base_raw + 'javascript'
             links[page[:-3]] = '<script type="text/javascript" src="' + tmp + '"></script>'
         elif 'templates/' in page:
-            tmp = base_template + page[10:-5]
-            links[page[:-5]] = '<link rel="import" href="' + tmp + '.html">'
+            pass
         else:
             if 'index' in page:
                 tmp = base_team + page[0:-10]
