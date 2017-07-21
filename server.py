@@ -5,13 +5,28 @@ import re
 import socketserver
 import time
 import urllib
+import urllib.parse as parse
 import urllib.request as request
 
 from template import get_page
 
 team_pages = {}
-host = "igem.org"
+host = "org"
 served_at = "localhost:8000"
+
+port = served_at.split(':')
+if len(port) == 1:
+    port = "80"
+else:
+    port = port[1]
+
+
+class NoRedirect(request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, hdrs, newurl):
+        pass
+
+
+noredir_opener = request.build_opener(NoRedirect())
 
 
 def request_igem_file(path, sub_domain):
@@ -78,34 +93,49 @@ class IGEMHTTPRequestHandler(server.SimpleHTTPRequestHandler):
         self.proxy_upstream()
 
     def proxy_upstream(self):
-        head = self.headers
+        head = {
+            k: v.replace(served_at, host)
+            for k, v in self.headers.items()
+            if k not in ("Content-Length", "Content-Type")
+        }
         nhost = head["Host"].replace(served_at, host)
         head["Host"] = nhost
-        del head["Origin"]
+        if "Cookie" in head:
+            head["Cookie"] = head["Cookie"].replace(served_at.split(":")[0], host)
+        url = "http://" + nhost + self.path
         data = None
         if self.command == "POST":
             data = self.rfile.read(int(self.headers['Content-Length']))
-        req = request.Request("http://" + nhost + self.path,
+            a = [b.encode('utf-8') for b in [served_at, host]]
+            for _ in range(3):
+                data = data.replace(*a)
+                a = [parse.quote(b).encode('utf-8') for b in a]
+            # head["Content-Length"] = str(len(data))
+            head["Referer"] = head["Referer"].replace("http:", "https:")
+            url = url.replace("http:", "https:")
+        req = request.Request(url,
                               data=data,
                               headers=head,
                               method=self.command)
+        opener = noredir_opener
         try:
-            with request.urlopen(req) as resp:
-                self.send_response(resp.status)
-                for k, v in dict(resp.info()).items():
-                    if k not in ["Transfer-Encoding"]:
-                        self.send_header(k, v.replace(host, served_at))
-                self.end_headers()
-                self.wfile.write(
-                    resp.read().replace(
-                        host.encode('utf-8'),
-                        served_at.encode('utf-8')
-                    ).replace(b"https", b"http")
-                )
+            resp = opener.open(req)
         except urllib.error.HTTPError as e:
-            self.send_response(e.code)
-            self.end_headers()
-
+            resp = e
+        self.send_response(resp.status)
+        for k, v in resp.info().items():
+            if k not in ["Transfer-Encoding"]:
+                v = v.replace(host, served_at).replace("https", "http")
+                if k == "Set-Cookie":
+                    v = v.replace(":" + port, "")
+                self.send_header(k, v)
+        self.end_headers()
+        self.wfile.write(
+            resp.read().replace(
+                host.encode('utf-8'),
+                served_at.encode('utf-8')
+            ).replace(b"https", b"http")
+        )
 
 class ThreadSocketServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
@@ -116,7 +146,7 @@ if __name__ == "__main__":
     stop = False
     while not stop:
         try:
-            server = ThreadSocketServer(("0.0.0.0", 8000), Handler)
+            server = ThreadSocketServer(("0.0.0.0", int(port)), Handler)
         except OSError as e:
             if e.errno != 98:
                 raise
