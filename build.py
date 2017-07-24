@@ -3,6 +3,7 @@ import glob
 import io
 import re
 import os
+from settings import team
 
 base_igem = 'http://2017.igem.org/'
 base_team = base_igem + 'Team:Bristol/'
@@ -42,7 +43,7 @@ def create_links():
             tmp = base_template + 'js/' + page[3:-3] + base_raw + 'javascript'
             links[page[:-3]] = '<script type="text/javascript" src="' + tmp + '"></script>'
         elif 'templates/' in page:
-            pass
+            links[page[:-5]] = '{{' + team + page[9:-5] + '}}'
         else:
             if 'index' in page:
                 tmp = base_team + page[0:-10]
