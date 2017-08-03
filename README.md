@@ -4,6 +4,8 @@ The iGEM Development Environment (IDE).
 
 IDE is a useful tool to allow local development for iGEM wiki users.
 
+If you are using IDE to help develop your Wiki please accredit the Bristol iGEM Team visibly on your collaboration page.
+
 ## Setup
 
 In order to use IDE you will need python3 installed.
@@ -33,7 +35,7 @@ There are currently three sub-folders of importance:
  * templates - This folder should contain your templates. For example, the
    original template is included. To use it on a page you add a reference to
    the template as in wiki, that is `{{templates/header}}` to reference
-   the header template. Note due to the iGEM Wiki system all html templates must be included outside the `html` tag, either above or below it. 
+   the header template. Note due to the iGEM Wiki system all html templates must be included outside the `html` tag, either above or below it.
 
 It is recommended that you have a generic header and footer template that apply
 across the entirety of your wiki for ease of use.
